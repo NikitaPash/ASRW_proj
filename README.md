@@ -22,8 +22,6 @@ The system is designed to demonstrate key software design patterns and principle
 - Concrete factories: `LightingDeviceFactory`, `ClimateDeviceFactory`, etc.
 - Each factory creates specific device types while following a common interface
 
-**When to use**: When a class cannot anticipate the type of objects it must create, or when a class wants its subclasses to specify the objects it creates.
-
 ### 2. Decorator (Structural Pattern)
 
 **Intent**: Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.
@@ -33,8 +31,6 @@ The system is designed to demonstrate key software design patterns and principle
 - Concrete components: `SmartLight`, `Thermostat`, etc.
 - Decorators: `TimerDecorator`, `SecurityDecorator`, `EnergyMonitorDecorator`, etc.
 - Each decorator adds specific functionality to base devices (scheduling, security features, energy monitoring)
-
-**When to use**: When you need to add responsibilities to objects dynamically without affecting other objects, or when extension by subclassing is impractical.
 
 ### 3. Observer (Behavioral Pattern)
 
@@ -46,8 +42,6 @@ The system is designed to demonstrate key software design patterns and principle
 - `EventSubscriber` observer interface
 - Concrete observers: `NotificationService`, `AutomationEngine`, `LoggingService`
 - When events occur in the home, relevant services respond appropriately
-
-**When to use**: When a change to one object requires changing others, and you don't know how many objects need to change or when.
 
 ## Design Principles Applied
 
@@ -62,12 +56,6 @@ The system is designed to demonstrate key software design patterns and principle
 4. **Interface Segregation Principle**: Clients are not forced to depend on interfaces they don't use (separate interfaces for different device capabilities).
 
 5. **Dependency Inversion Principle**: High-level modules depend on abstractions, not concrete implementations (automation engine works with device interfaces, not specific device classes).
-
-### Other Design Principles
-
-- **Composition over Inheritance**: Using composition (especially in the Decorator pattern) to achieve flexible designs.
-- **Program to Interfaces**: System components interact through well-defined interfaces.
-- **Favor Immutability**: State changes are handled through clear transactions rather than direct mutation where possible.
 
 ## Setup and Usage
 
@@ -89,45 +77,59 @@ pip install -r requirements.txt
 
 ### Running the Application
 ```bash
+# Run the application in CLI mode
 python -m src.main
+
+# Run the application with GUI interface
+python -m src.main --gui
 ```
 
 ### Running Tests
 ```bash
+# Run all tests
 pytest
+
+# Run tests with coverage report
+pytest --cov=src --cov-report=term --cov-report=xml:coverage.xml
 ```
 
 ## Project Structure
-
 ```
-smart-home-automation/
-├── src/                   # Source code
-│   ├── smart_home/        # Core package
-│   │   ├── devices/       # Smart device implementations
-│   │   ├── automation/    # Automation rules and engine
-│   │   └── interfaces/    # Core interfaces and abstract classes
-│   └── main.py            # Application entry point
-├── tests/                 # Test suite
-├── docs/                  # Additional documentation
-│   └── class_diagram.png  # UML diagrams
-└── README.md              # This file
+.
+├── README.md
+├── requirements.txt
+├── docker-compose.yml
+├── coverage.xml
+├── sonar-project.properties
+├── wait_for_sonar.sh
+├── src/
+│   ├── __init__.py
+│   ├── main.py
+│   └── smart_home/
+│       ├── __init__.py
+│       ├── automation/
+│       │   └── event_system.py
+│       ├── devices/
+│       │   ├── __init__.py
+│       │   ├── base_devices.py
+│       │   ├── device_decorators.py
+│       │   └── device_factories.py
+│       ├── gui/
+│       │   ├── __init__.py
+│       │   └── main_gui.py
+│       └── interfaces/
+│           ├── __init__.py
+│           ├── device.py
+│           └── event.py
+└── tests/
+    ├── conftest.py
+    ├── test_decorators.py
+    ├── test_factories.py
+    ├── test_gui.py
+    └── test_observer.py
 ```
 
-## Extensibility & Scalability
+## UML Diagrams
 
-The system is designed to be easily extended:
-- New device types can be added by implementing the Device interface and creating a corresponding factory
-- Additional decorators can be created to add new behaviors to devices
-- New event types and observers can be added to respond to different scenarios
-
-## Testing
-
-The project includes over 20 unit tests covering:
-- Device creation and operations
-- Decorator functionality
-- Observer pattern notifications
-- Integration tests for automation scenarios
-
-Each test verifies a specific aspect of functionality while ensuring the design patterns are implemented correctly.
-
-
+To visualize the system's architecture and design patterns, here's the UML diagram:
+![img.png](img.png)
