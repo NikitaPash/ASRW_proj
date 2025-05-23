@@ -1,10 +1,4 @@
-"""
-Device decorator implementations for the Smart Home Automation system.
-
-This module implements the Decorator pattern with concrete decorators
-that add functionality to smart home devices.
-"""
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, Any, List, Optional, Callable
 
 from src.smart_home.interfaces.device import Device, DeviceCapability
@@ -19,14 +13,8 @@ class TimerDecorator(Device):
     """
 
     def __init__(self, device: Device):
-        """
-        Initialize the timer decorator.
-
-        Args:
-            device: The device to decorate with timing functionality
-        """
         self._device = device
-        self._schedules = []  # List of scheduled actions
+        self._schedules = []
 
     def get_id(self) -> str:
         return self._device.get_id()
@@ -41,7 +29,6 @@ class TimerDecorator(Device):
         return self._device.get_capabilities()
 
     def get_state(self) -> Dict[str, Any]:
-        # Add schedule information to the device state
         state = self._device.get_state()
         state['has_schedules'] = len(self._schedules) > 0
         state['next_scheduled_action'] = self._get_next_scheduled_action()
@@ -54,18 +41,8 @@ class TimerDecorator(Device):
         return self._device.supports_capability(capability)
 
     def schedule_action(self, time: datetime, new_state: Dict[str, Any]) -> bool:
-        """
-        Schedule a state change to occur at a specific time.
-
-        Args:
-            time: When the state change should occur
-            new_state: The state to apply at the scheduled time
-
-        Returns:
-            bool: True if the schedule was added successfully
-        """
         if time <= datetime.now():
-            return False  # Can't schedule in the past
+            return False
 
         self._schedules.append({
             'time': time,
@@ -82,7 +59,6 @@ class TimerDecorator(Device):
         if not self._schedules:
             return None
 
-        # Find the schedule with the closest time in the future
         now = datetime.now()
         future_schedules = [s for s in self._schedules if s['time'] > now]
 
@@ -104,16 +80,9 @@ class LoggingDecorator(Device):
     """
 
     def __init__(self, device: Device, max_history: int = 100):
-        """
-        Initialize the logging decorator.
-
-        Args:
-            device: The device to decorate with logging functionality
-            max_history: Maximum number of state changes to keep in history
-        """
         self._device = device
         self._max_history = max_history
-        self._history = []  # List of historical state changes
+        self._history = []
 
     def get_id(self) -> str:
         return self._device.get_id()
@@ -133,14 +102,11 @@ class LoggingDecorator(Device):
         return state
 
     def set_state(self, new_state: Dict[str, Any]) -> bool:
-        # Get the previous state for comparison
         old_state = self._device.get_state()
 
-        # Try to update the device state
         success = self._device.set_state(new_state)
 
         if success:
-            # Record the state change in history
             self._add_history_entry(old_state, new_state)
 
         return success
@@ -157,9 +123,8 @@ class LoggingDecorator(Device):
         self._history = []
 
     def _add_history_entry(self, old_state: Dict[str, Any],
-                          new_state: Dict[str, Any]) -> None:
+                           new_state: Dict[str, Any]) -> None:
         """Add a state change entry to the history."""
-        # Only record changes, not the complete state
         changes = {}
         for key, new_value in new_state.items():
             if key in old_state and old_state[key] != new_value:
@@ -168,7 +133,7 @@ class LoggingDecorator(Device):
                     'to': new_value
                 }
 
-        if changes:  # Only record if something actually changed
+        if changes:
             entry = {
                 'timestamp': datetime.now().isoformat(),
                 'changes': changes
@@ -176,7 +141,6 @@ class LoggingDecorator(Device):
 
             self._history.append(entry)
 
-            # Maintain history size limit
             if len(self._history) > self._max_history:
                 self._history = self._history[-self._max_history:]
 
@@ -190,16 +154,7 @@ class NotificationDecorator(Device):
     """
 
     def __init__(self, device: Device, event_publisher: EventPublisher,
-                notification_criteria: Optional[Callable[[Dict[str, Any], Dict[str, Any]], bool]] = None):
-        """
-        Initialize the notification decorator.
-
-        Args:
-            device: The device to decorate with notification functionality
-            event_publisher: Publisher to send events through
-            notification_criteria: Optional function that determines when to send notifications
-                                  Takes old_state and new_state as parameters
-        """
+                 notification_criteria: Optional[Callable[[Dict[str, Any], Dict[str, Any]], bool]] = None):
         self._device = device
         self._publisher = event_publisher
         self._criteria = notification_criteria
@@ -222,14 +177,11 @@ class NotificationDecorator(Device):
         return state
 
     def set_state(self, new_state: Dict[str, Any]) -> bool:
-        # Get the previous state for comparison
         old_state = self._device.get_state()
 
-        # Try to update the device state
         success = self._device.set_state(new_state)
 
         if success:
-            # Check if we should notify based on this state change
             should_notify = True
             if self._criteria:
                 should_notify = self._criteria(old_state, self._device.get_state())
@@ -243,7 +195,7 @@ class NotificationDecorator(Device):
         return self._device.supports_capability(capability)
 
     def _publish_state_change_event(self, old_state: Dict[str, Any],
-                                   new_state: Dict[str, Any]) -> None:
+                                    new_state: Dict[str, Any]) -> None:
         """Publish an event for the state change."""
         event = Event(
             event_type=EventType.DEVICE_STATE_CHANGED,

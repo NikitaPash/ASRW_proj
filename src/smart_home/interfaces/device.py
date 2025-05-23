@@ -1,9 +1,3 @@
-"""
-Device interfaces for the Smart Home Automation system.
-
-This module defines the core interfaces for all devices in the system,
-supporting both the Factory Method and Decorator design patterns.
-"""
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import Dict, Any, Optional
@@ -21,14 +15,14 @@ class DeviceType(Enum):
 
 class DeviceCapability(Enum):
     """Enumeration of capabilities that devices can support."""
-    POWER = auto()  # Can be turned on/off
-    BRIGHTNESS = auto()  # Has adjustable brightness
-    COLOR = auto()  # Has adjustable color
-    TEMPERATURE = auto()  # Can sense or set temperature
-    MOTION = auto()  # Can detect motion
-    AUDIO = auto()  # Can play or record audio
-    VIDEO = auto()  # Can capture or display video
-    LOCK_UNLOCK = auto()  # Can lock/unlock
+    POWER = auto()
+    BRIGHTNESS = auto()
+    COLOR = auto()
+    TEMPERATURE = auto()
+    MOTION = auto()
+    AUDIO = auto()
+    VIDEO = auto()
+    LOCK_UNLOCK = auto()
 
 
 class Device(ABC):
@@ -92,12 +86,6 @@ class DeviceDecorator(Device):
     """
 
     def __init__(self, device: Device):
-        """
-        Initialize the decorator with the device to wrap.
-
-        Args:
-            device: The device to decorate with additional functionality
-        """
         self._device = device
 
     def get_id(self) -> str:
@@ -131,15 +119,4 @@ class DeviceFactory(ABC):
 
     @abstractmethod
     def create_device(self, device_id: str, name: str, config: Optional[Dict[str, Any]] = None) -> Device:
-        """
-        Create a new device with the given parameters.
-
-        Args:
-            device_id: Unique identifier for the device
-            name: User-friendly name for the device
-            config: Optional configuration parameters for the device
-
-        Returns:
-            A concrete Device instance
-        """
         pass

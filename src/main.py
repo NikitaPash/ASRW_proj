@@ -1,26 +1,21 @@
-"""
-Main application for the Smart Home Automation System.
+import argparse
 
-This module demonstrates the integration of the three design patterns:
-- Factory Method (Creational)
-- Decorator (Structural)
-- Observer (Behavioral)
-"""
-from src.smart_home.interfaces.device import DeviceCapability
-from src.smart_home.interfaces.event import EventType, Event
-from src.smart_home.devices.device_factories import (
-    LightingDeviceFactory, ClimateDeviceFactory,
-    SecurityDeviceFactory, SensorDeviceFactory
+from src.smart_home.automation.event_system import (
+    EventManager, LoggingEventSubscriber, NotificationService
 )
 from src.smart_home.devices.device_decorators import (
     TimerDecorator, LoggingDecorator, NotificationDecorator
 )
-from src.smart_home.automation.event_system import (
-    EventManager, LoggingEventSubscriber, NotificationService
+from src.smart_home.devices.device_factories import (
+    LightingDeviceFactory, ClimateDeviceFactory,
+    SecurityDeviceFactory, SensorDeviceFactory
 )
+from src.smart_home.gui.main_gui import launch_gui
+from src.smart_home.interfaces.event import EventType, Event
 
-def main():
-    """Run a demonstration of the Smart Home Automation System."""
+
+def cli_demo():
+    """Run a demonstration of the Smart Home Automation System in CLI mode."""
     print("Smart Home Automation System Demo")
     print("=================================")
 
@@ -137,6 +132,29 @@ def main():
         print(f"  - {entry['timestamp']}: {entry['type']} from {entry['source']}")
 
     print("\nSmart Home Automation System Demo completed.")
+
+
+def main():
+    """Main entry point for the application."""
+    parser = argparse.ArgumentParser(description='Smart Home Automation System')
+    parser.add_argument('--gui', action='store_true', help='Launch with GUI interface')
+    args = parser.parse_args()
+
+    if args.gui:
+        # Launch with GUI interface
+        event_manager = EventManager()
+        logger = LoggingEventSubscriber()
+        notifier = NotificationService()
+
+        # Register subscribers with the event manager
+        event_manager.subscribe(logger)
+        event_manager.subscribe(notifier)
+
+        # Launch the GUI
+        launch_gui(event_manager)
+    else:
+        # Run CLI demo
+        cli_demo()
 
 
 if __name__ == "__main__":

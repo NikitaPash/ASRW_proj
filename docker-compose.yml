@@ -1,0 +1,44 @@
+services:
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonar
+    ports:
+      - "9000:9000"
+      - "9092:9092"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+      - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    container_name: sonarqube_db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+
+  sonarscanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: sonar_scanner
+    environment:
+      - SONAR_HOST_URL=${SONAR_HOST_URL}
+      - SONAR_LOGIN=${SONAR_TOKEN}
+    volumes:
+      - ./:/usr/src/
+    depends_on:
+      - sonarqube
+    command: >
+      sh -c "./wait_for_sonar.sh sonarqube:9000 -- 
+             sonar-scanner -Dsonar.token=$SONAR_TOKEN -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.projectName=$SONAR_PROJECT_NAME -Dsonar.python.coverage.reportPaths=./coverage.xml"
+    restart: "no"
+    networks:
+      - default
+
+volumes:
+  sonarqube_db_data:

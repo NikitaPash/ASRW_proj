@@ -1,14 +1,8 @@
-"""
-Event interfaces for the Smart Home Automation system.
-
-This module defines the core interfaces for the Observer pattern implementation,
-which is used to handle events and notifications throughout the system.
-"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class EventType(Enum):
@@ -30,7 +24,7 @@ class EventType(Enum):
 class Event:
     """Data class representing an event in the system."""
     event_type: EventType
-    source: str  # ID of the event source (e.g., device_id)
+    source: str
     timestamp: datetime = None
     data: Dict[str, Any] = None
 
@@ -51,22 +45,10 @@ class EventSubscriber(ABC):
 
     @abstractmethod
     def update(self, event: Event) -> None:
-        """
-        Handle an event notification from a publisher.
-
-        Args:
-            event: The event that occurred
-        """
         pass
 
     @abstractmethod
     def get_subscribed_event_types(self) -> List[EventType]:
-        """
-        Get the types of events this subscriber is interested in.
-
-        Returns:
-            List of event types this subscriber wants to be notified about
-        """
         pass
 
 
@@ -79,30 +61,12 @@ class EventPublisher(ABC):
 
     @abstractmethod
     def subscribe(self, subscriber: EventSubscriber) -> None:
-        """
-        Register a new subscriber for events.
-
-        Args:
-            subscriber: The subscriber to register
-        """
         pass
 
     @abstractmethod
     def unsubscribe(self, subscriber: EventSubscriber) -> None:
-        """
-        Remove a subscriber from the notification list.
-
-        Args:
-            subscriber: The subscriber to remove
-        """
         pass
 
     @abstractmethod
     def notify(self, event: Event) -> None:
-        """
-        Notify all relevant subscribers about an event.
-
-        Args:
-            event: The event to notify subscribers about
-        """
         pass

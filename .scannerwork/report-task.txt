@@ -1,0 +1,6 @@
+projectKey=ASRW_project
+serverUrl=http://sonarqube:9000
+serverVersion=25.5.0.107428
+dashboardUrl=http://sonarqube:9000/dashboard?id=ASRW_project
+ceTaskId=60cc60e2-5066-41f9-b696-5496cb45c7f7
+ceTaskUrl=http://sonarqube:9000/api/ce/task?id=60cc60e2-5066-41f9-b696-5496cb45c7f7

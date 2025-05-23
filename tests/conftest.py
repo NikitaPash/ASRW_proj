@@ -1,7 +1,3 @@
-"""
-Test configuration and utility functions for the Smart Home Automation System tests.
-"""
-import pytest
 import os
 import sys
 
